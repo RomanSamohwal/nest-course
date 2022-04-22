@@ -1,26 +1,27 @@
-import { Column, DataType, Model, Table } from "sequelize-typescript";
+import {BelongsToMany, Column, DataType, Model, Table} from "sequelize-typescript";
 import {ApiProperty} from "@nestjs/swagger";
+import {User} from "../users/users.model";
+import {UserRoles} from "./user-roles.model";
 
-interface UserCreationAttrs {
-  email: string;
-  password: string;
+interface RoleCreationAttrs {
+    value: string;
+    description: string;
 }
 
-@Table({ tableName: "users" })
-export class User extends Model<User, UserCreationAttrs> {
-  @ApiProperty({example: '1', description: 'Уникальный индификатор'})
-  @Column({ type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true })
-  id: number;
-  @ApiProperty({example: 'user@gmail.com', description: 'Почтовый адрес'})
-  @Column({ type: DataType.STRING, unique: true, allowNull: false })
-  email: string;
-  @ApiProperty({example: '12345', description: 'Пароль'})
-  @Column({ type: DataType.STRING, allowNull: false })
-  password: string;
-  @ApiProperty({example: 'true', description: 'Забанен пользователь или нет'})
-  @Column({ type: DataType.BOOLEAN, defaultValue: false })
-  banned: boolean;
-  @ApiProperty({example: 'За нарушение правил', description: 'Причина блокировки'})
-  @Column({ type: DataType.STRING, allowNull: true })
-  banReason: string;
+@Table({tableName: "roles"})
+export class Role extends Model<Role, RoleCreationAttrs> {
+    @ApiProperty({example: '1', description: 'Уникальный индификатор'})
+    @Column({type: DataType.INTEGER, unique: true, autoIncrement: true, primaryKey: true})
+    id: number;
+
+    @ApiProperty({example: 'ADMIN', description: 'Значение значение роли'})
+    @Column({type: DataType.STRING, unique: true, allowNull: false})
+    value: string;
+
+    @ApiProperty({example: 'Администратор', description: 'Описание роли'})
+    @Column({type: DataType.STRING, allowNull: false})
+    description: string;
+
+    @BelongsToMany(() => User, () => UserRoles)
+    user: User[]
 }
